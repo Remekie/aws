@@ -70,7 +70,7 @@
   text-decoration: underline;
 }
 
-@media (min-width: 900px) {
+@media (width >= 900px) {
   .cards-editorial > ul {
     grid-template-columns: repeat(3, 1fr);
   }

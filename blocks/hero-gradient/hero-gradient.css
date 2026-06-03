@@ -5,28 +5,39 @@
 
 .hero-gradient {
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 32px;
-  padding: 60px 24px;
-  min-height: 400px;
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 40px 24px;
+  min-height: 350px;
   background: linear-gradient(135deg, #1a1a2e 0%, #232f3e 30%, #0d324d 60%, #1a1a2e 100%);
   overflow: hidden;
 }
 
 .hero-gradient > div:first-child {
-  display: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  opacity: 0.8;
+}
+
+.hero-gradient > div:first-child picture,
+.hero-gradient > div:first-child img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .hero-gradient > div:last-child {
   position: relative;
   z-index: 1;
-  max-width: 600px;
+  max-width: 560px;
 }
 
 .hero-gradient h1 {
   color: #fff;
-  font-size: 36px;
+  font-size: 28px;
   font-weight: 700;
   line-height: 1.2;
   margin: 0 0 16px;
@@ -39,9 +50,13 @@
   margin: 0 0 24px;
 }
 
-.hero-gradient a {
+.hero-gradient .button-container {
+  display: block;
+}
+
+.hero-gradient a.button {
   display: inline-block;
-  background: var(--color-aws-orange);
+  background: var(--color-aws-orange, #f90);
   color: #16191f;
   padding: 10px 24px;
   border-radius: 20px;
@@ -51,43 +66,31 @@
   transition: background 0.2s;
 }
 
-.hero-gradient a:hover {
-  background: var(--color-aws-smile);
-}
-
-.hero-gradient picture {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 50%;
-  height: 100%;
-}
-
-.hero-gradient img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.hero-gradient a.button:hover {
+  background: var(--color-aws-smile, #ec7211);
 }
 
 @media (width >= 900px) {
   .hero-gradient {
-    grid-template-columns: 1fr 1fr;
-    padding: 80px 64px;
-    min-height: 500px;
+    flex-direction: row;
     align-items: center;
+    padding: 80px 64px;
+    min-height: 450px;
+  }
+
+  .hero-gradient > div:last-child {
+    flex: 1;
   }
 
   .hero-gradient > div:first-child {
-    display: block;
-  }
-
-  .hero-gradient picture {
     position: relative;
-    width: 100%;
+    flex: 1;
+    width: auto;
+    height: auto;
   }
 
   .hero-gradient h1 {
-    font-size: 48px;
+    font-size: 42px;
   }
 
   .hero-gradient p {

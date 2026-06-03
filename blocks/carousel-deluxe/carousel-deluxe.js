@@ -1,5 +1,4 @@
-import { moveInstrumentation } from '../../scripts/scripts.js';
-import { fetchPlaceholders } from '../../scripts/placeholders.js';
+const placeholders = { carousel: 'Carousel', carouselSlideControls: 'Carousel Slide Controls', previousSlide: 'Previous Slide', nextSlide: 'Next Slide', of: 'of' };
 
 function updateActiveSlide(slide) {
   const block = slide.closest('.carousel-deluxe');
@@ -97,7 +96,6 @@ export default async function decorate(block) {
   const rows = block.querySelectorAll(':scope > div');
   const isSingleSlide = rows.length < 2;
 
-  const placeholders = await fetchPlaceholders();
 
   block.setAttribute('role', 'region');
   block.setAttribute('aria-roledescription', placeholders.carousel || 'Carousel');
@@ -130,7 +128,6 @@ export default async function decorate(block) {
 
   rows.forEach((row, idx) => {
     const slide = createSlide(row, idx, carouselId);
-    moveInstrumentation(row, slide);
     slidesWrapper.append(slide);
 
     if (slideIndicators) {
