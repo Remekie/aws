@@ -784,14 +784,12 @@ main > .section.cards-industry-container .default-content-wrapper h2 {
 main > .section.carousel-deluxe-container .default-content-wrapper {
   padding-inline: var(--content-padding-inline);
   padding-block: 20px 16px;
-  max-width: 1440px;
-  margin-inline: auto;
   box-sizing: border-box;
 }
 
 @media (width >= 900px) {
   main > .section.carousel-deluxe-container .default-content-wrapper {
-    padding-inline: 120px;
+    padding-inline: max(120px, calc((100% - 1200px) / 2));
     padding-block: 40px 24px;
   }
 }

@@ -5,15 +5,13 @@
 .cards-industry-container {
   padding-block: 40px;
   padding-inline: var(--content-padding-inline);
-  max-width: 1440px;
-  margin-inline: auto;
   box-sizing: border-box;
 }
 
 @media (width >= 900px) {
   .cards-industry-container {
     padding-block: 60px;
-    padding-inline: 120px;
+    padding-inline: max(120px, calc((100% - 1200px) / 2));
   }
 }
 
