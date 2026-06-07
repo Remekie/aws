@@ -17,33 +17,43 @@
   min-height: 350px;
 }
 
-/* Row 1: Image — absolute, covers entire block */
+/* Row 1: Image — absolute, covers block as background on mobile */
 .hero-gradient > div:first-child {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
 
-.hero-gradient > div:first-child picture,
-.hero-gradient > div:first-child img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Row 2: Text content — overlaid on the image */
+/* Row 2: Text content — overlaid on image */
 .hero-gradient > div:last-child {
   position: relative;
   z-index: 1;
   padding: 40px 24px 80px;
 }
 
-/* Inner content cell — constrained width */
+/* Inner content cell */
 .hero-gradient > div:last-child > div {
   display: flex;
   flex-direction: column;
   gap: 8px;
   max-width: 504px;
+}
+
+/* Ensure image cell div fills the absolutely-positioned container */
+.hero-gradient > div:first-child > div {
+  height: 100%;
+}
+
+.hero-gradient > div:first-child picture {
+  display: block;
+  height: 100%;
+}
+
+.hero-gradient > div:first-child img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
 }
 
 /* Heading */
@@ -100,14 +110,38 @@ main .hero-gradient a.button:any-link:focus-visible {
   box-shadow: none;
 }
 
-/* Desktop layout */
+/* Desktop layout: grid — text left on gradient, image right */
 @media (width >= 900px) {
   .hero-gradient {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
     min-height: 525px;
   }
 
+  /* Image moves to right column; no longer absolute */
+  .hero-gradient > div:first-child {
+    position: static;
+    inset: auto;
+    z-index: auto;
+    grid-column: 2;
+    grid-row: 1;
+    overflow: hidden;
+  }
+
+  .hero-gradient > div:first-child img {
+    object-position: center center;
+  }
+
+  /* Text occupies left column; CSS gradient shows behind it */
   .hero-gradient > div:last-child {
-    padding: 104px 0 125px 160px;
+    position: static;
+    z-index: auto;
+    grid-column: 1;
+    grid-row: 1;
+    padding: 104px 40px 125px 160px;
+    display: flex;
+    align-items: flex-start;
   }
 
   .hero-gradient h1 {
@@ -125,7 +159,7 @@ main .hero-gradient a.button:any-link:focus-visible {
   }
 }
 
-/* Wide screens: constrain left offset proportionally */
+/* Wide screens: scale left padding proportionally */
 @media (width >= 1200px) {
   .hero-gradient > div:last-child {
     padding-left: 11.1%; /* ~160px at 1440px viewport */
