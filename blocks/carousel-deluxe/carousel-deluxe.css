@@ -335,11 +335,12 @@
 /* === Scale animation: peek slides shrink, current slide at 100% ===
    translateX compensates for center-origin scaling so the peek-visible
    edge of each adjacent slide stays anchored at its layout boundary,
-   keeping the actual slide image visible in the peek strip. */
+   keeping the actual slide image visible in the peek strip.
+   tx = ±(1 - peek_scale) / 2 = ±(1 - 0.75) / 2 = ±12.5% */
 @keyframes carousel-slide-scale {
-  0% { transform: translateX(-6%) scale(0.88); }  /* entering from right: anchor left edge */
-  50% { transform: none; }                          /* centered: full size */
-  100% { transform: translateX(6%) scale(0.88); }  /* exiting to left: anchor right edge */
+  0% { transform: translateX(-12.5%) scale(0.75); }  /* entering from right: anchor left edge */
+  50% { transform: none; }                             /* centered: full size */
+  100% { transform: translateX(12.5%) scale(0.75); }  /* exiting to left: anchor right edge */
 }
 
 /* === Desktop styles === */
@@ -355,8 +356,8 @@
 
   .carousel-deluxe .carousel-deluxe-slide {
     height: 640px;
-    flex: 0 0 calc(100vw - 64px);
-    width: calc(100vw - 64px);
+    flex: 0 0 65vw;
+    width: 65vw;
     padding: 0;
     animation: carousel-slide-scale linear;
     animation-timeline: view(inline);

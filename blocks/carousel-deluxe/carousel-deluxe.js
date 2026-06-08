@@ -5,7 +5,7 @@ function updateActiveSlide(slide) {
   const slideIndex = parseInt(slide.dataset.slideIndex, 10);
   block.dataset.activeSlide = slideIndex;
 
-  const slides = block.querySelectorAll('.carousel-deluxe-slide');
+  const slides = block.querySelectorAll('.carousel-deluxe-slide:not([data-is-clone])');
 
   slides.forEach((aSlide, idx) => {
     aSlide.setAttribute('aria-hidden', idx !== slideIndex);
@@ -30,18 +30,13 @@ function updateActiveSlide(slide) {
 
 export function showSlide(block, slideIndex = 0, behavior = 'smooth') {
   const slidesEl = block.querySelector('.carousel-deluxe-slides');
-  const slides = block.querySelectorAll('.carousel-deluxe-slide');
-  let realSlideIndex = slideIndex < 0 ? slides.length - 1 : slideIndex;
-  if (slideIndex >= slides.length) realSlideIndex = 0;
-  const activeSlide = slides[realSlideIndex];
-
-  activeSlide.querySelectorAll('a').forEach((link) => link.removeAttribute('tabindex'));
-  const centeredLeft = activeSlide.offsetLeft + activeSlide.offsetWidth / 2 - slidesEl.offsetWidth / 2;
-  slidesEl.scrollTo({
-    top: 0,
-    left: Math.max(0, centeredLeft),
-    behavior,
-  });
+  const realSlides = [...slidesEl.querySelectorAll('.carousel-deluxe-slide:not([data-is-clone])')];
+  const N = realSlides.length;
+  const idx = ((slideIndex % N) + N) % N;
+  const target = realSlides[idx];
+  target.querySelectorAll('a').forEach((link) => link.removeAttribute('tabindex'));
+  const centeredLeft = target.offsetLeft + target.offsetWidth / 2 - slidesEl.offsetWidth / 2;
+  slidesEl.scrollTo({ top: 0, left: Math.max(0, centeredLeft), behavior });
 }
 
 function updateHaloPosition(block) {
@@ -63,14 +58,14 @@ function updateHaloPosition(block) {
   const H = best.offsetHeight;
 
   // Derive the slide's current scale from its cover(inline) animation progress.
-  // Keyframes: 0% translateX(-6%) scale(0.88), 50% none, 100% translateX(+6%) scale(0.88)
+  // Keyframes: 0% translateX(-12.5%) scale(0.75), 50% none, 100% translateX(+12.5%) scale(0.75)
   const coverStart = best.offsetLeft - cw;
   const coverEnd = best.offsetLeft + W;
   const p = coverEnd > coverStart
     ? Math.max(0, Math.min(1, (scrollLeft - coverStart) / (coverEnd - coverStart)))
     : 0.5;
   const t = p <= 0.5 ? p * 2 : (1 - p) * 2; // 0→1→0 as p goes 0→0.5→1
-  const scale = 0.88 + 0.12 * t;
+  const scale = 0.75 + 0.25 * t;
 
   // Visual horizontal bounds (translateX compensation anchors the peek-visible edge)
   const layoutLeft = best.offsetLeft - scrollLeft;
@@ -84,6 +79,33 @@ function updateHaloPosition(block) {
   block.style.setProperty('--halo-right', `${Math.max(0, cw - vRight)}px`);
   block.style.setProperty('--halo-top', `${Math.max(0, vShrink)}px`);
   block.style.setProperty('--halo-bottom', `${Math.max(0, vShrink)}px`);
+}
+
+// When scroll settles on a clone, silently teleport to the real counterpart.
+function handleScrollEnd(block) {
+  const slidesEl = block.querySelector('.carousel-deluxe-slides');
+  const allSlides = [...slidesEl.querySelectorAll('.carousel-deluxe-slide')];
+  const cw = slidesEl.offsetWidth;
+  const { scrollLeft } = slidesEl;
+
+  let best = null;
+  let bestDist = Infinity;
+  allSlides.forEach((s) => {
+    const d = Math.abs(s.offsetLeft + s.offsetWidth / 2 - scrollLeft - cw / 2);
+    if (d < bestDist) { bestDist = d; best = s; }
+  });
+
+  if (!best || !best.dataset.isClone) return;
+
+  const realIdx = parseInt(best.dataset.cloneOf, 10);
+  const realSlide = allSlides.find(
+    (s) => !s.dataset.isClone && parseInt(s.dataset.slideIndex, 10) === realIdx,
+  );
+  if (!realSlide) return;
+
+  const centeredLeft = realSlide.offsetLeft + realSlide.offsetWidth / 2 - cw / 2;
+  slidesEl.scrollTo({ left: Math.max(0, centeredLeft), behavior: 'instant' });
+  updateHaloPosition(block);
 }
 
 function bindEvents(block) {
@@ -105,12 +127,26 @@ function bindEvents(block) {
   });
 
   const slidesEl = block.querySelector('.carousel-deluxe-slides');
-  slidesEl.addEventListener('scroll', () => updateHaloPosition(block), { passive: true });
+  let scrollEndTimer;
+  slidesEl.addEventListener('scroll', () => {
+    updateHaloPosition(block);
+    clearTimeout(scrollEndTimer);
+    scrollEndTimer = setTimeout(() => handleScrollEnd(block), 200);
+  }, { passive: true });
+  // scrollend fires natively where supported; the setTimeout above is the fallback
+  slidesEl.addEventListener('scrollend', () => {
+    clearTimeout(scrollEndTimer);
+    handleScrollEnd(block);
+  }, { passive: true });
+
   requestAnimationFrame(() => updateHaloPosition(block));
 
+  // Only count real slides as "active" — clones never reach 50% visibility (peek = ~25%)
   const slideObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) updateActiveSlide(entry.target);
+      if (entry.isIntersecting && !entry.target.dataset.isClone) {
+        updateActiveSlide(entry.target);
+      }
     });
   }, { threshold: 0.5 });
   block.querySelectorAll('.carousel-deluxe-slide').forEach((slide) => {
@@ -188,10 +224,34 @@ export default async function decorate(block) {
     row.remove();
   });
 
+  // Infinite loop: clone last→prepend, clone first→append so there is always a peek on both sides
+  if (!isSingleSlide) {
+    const realSlides = [...slidesWrapper.querySelectorAll('.carousel-deluxe-slide')];
+    const N = realSlides.length;
+    const cloneFirst = realSlides[0].cloneNode(true);
+    const cloneLast = realSlides[N - 1].cloneNode(true);
+    cloneFirst.removeAttribute('id');
+    cloneLast.removeAttribute('id');
+    cloneFirst.dataset.isClone = 'true';
+    cloneFirst.dataset.cloneOf = '0';
+    cloneLast.dataset.isClone = 'true';
+    cloneLast.dataset.cloneOf = String(N - 1);
+    cloneFirst.querySelectorAll('a').forEach((a) => a.setAttribute('tabindex', '-1'));
+    cloneLast.querySelectorAll('a').forEach((a) => a.setAttribute('tabindex', '-1'));
+    slidesWrapper.append(cloneFirst);
+    slidesWrapper.prepend(cloneLast);
+  }
+
   container.append(slidesWrapper);
   block.prepend(container);
 
   if (!isSingleSlide) {
+    block.dataset.activeSlide = '0';
     bindEvents(block);
+    // Scroll to the first real slide (past the prepended clone) without animation
+    requestAnimationFrame(() => {
+      showSlide(block, 0, 'instant');
+      updateHaloPosition(block);
+    });
   }
 }
