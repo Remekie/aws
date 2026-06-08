@@ -55,15 +55,22 @@ const setupObservers = () => {
           case 'cards-industry-image':
             movePictureInstrumentation(addedElements, mutation.removedNodes);
             break;
-          case 'carousel-deluxe':
-            // rows become li.carousel-deluxe-slide elements inside a ul
-            if (addedElements.length === 1 && addedElements[0].tagName === 'UL') {
-              const ulEl = addedElements[0];
-              [...mutation.removedNodes].filter((n) => n.tagName === 'DIV').forEach((div, i) => {
-                if (i < ulEl.children.length) moveInstrumentation(div, ulEl.children[i]);
-              });
+          case 'carousel-deluxe': {
+            // rows become li.carousel-deluxe-slide elements inside a container > ul
+            const addedContainer = [...addedElements].find(
+              (n) => n.tagName === 'DIV' && n.classList.contains('carousel-deluxe-slides-container'),
+            );
+            if (addedContainer) {
+              const ulEl = addedContainer.querySelector('ul.carousel-deluxe-slides');
+              if (ulEl) {
+                const realSlides = [...ulEl.querySelectorAll('.carousel-deluxe-slide:not([data-is-clone])')];
+                [...mutation.removedNodes].filter((n) => n.tagName === 'DIV').forEach((div, i) => {
+                  if (i < realSlides.length) moveInstrumentation(div, realSlides[i]);
+                });
+              }
             }
             break;
+          }
           case 'journey-map':
             // handle row div → article replacements (custom block)
             if (addedElements.length === 1 && addedElements[0].tagName === 'ARTICLE') {

@@ -189,10 +189,10 @@ export default async function decorate(block) {
 
   const slidesWrapper = document.createElement('ul');
   slidesWrapper.classList.add('carousel-deluxe-slides');
-  block.prepend(slidesWrapper);
 
+  let counterEl = null;
   if (!isSingleSlide) {
-    const counterEl = document.createElement('div');
+    counterEl = document.createElement('div');
     counterEl.classList.add('carousel-deluxe-counter');
     counterEl.setAttribute('aria-label', placeholders.carouselSlideControls || 'Carousel Slide Controls');
     counterEl.innerHTML = `
@@ -202,14 +202,10 @@ export default async function decorate(block) {
       </span>
       <button type="button" class="slide-next" aria-label="${placeholders.nextSlide || 'Next Slide'}"></button>
     `;
-    block.append(counterEl);
   }
 
   rows.forEach((row, idx) => {
-    const slide = createSlide(row, idx, carouselId);
-    slidesWrapper.append(slide);
-
-    row.remove();
+    slidesWrapper.append(createSlide(row, idx, carouselId));
   });
 
   // Infinite loop: clone last→prepend, clone first→append so there is always a peek on both sides
@@ -231,7 +227,13 @@ export default async function decorate(block) {
   }
 
   container.append(slidesWrapper);
-  block.prepend(container);
+
+  // replaceChildren produces a single mutation record so UE instrumentation moves correctly
+  if (counterEl) {
+    block.replaceChildren(container, counterEl);
+  } else {
+    block.replaceChildren(container);
+  }
 
   if (!isSingleSlide) {
     block.dataset.activeSlide = '0';
