@@ -47,24 +47,43 @@ export function showSlide(block, slideIndex = 0, behavior = 'smooth') {
 function updateHaloPosition(block) {
   const slidesEl = block.querySelector('.carousel-deluxe-slides');
   const slides = [...block.querySelectorAll('.carousel-deluxe-slide')];
-  const containerWidth = slidesEl.offsetWidth;
-  const viewportCenter = slidesEl.scrollLeft + containerWidth / 2;
+  const cw = slidesEl.offsetWidth;
+  const { scrollLeft } = slidesEl;
 
-  let bestSlide = null;
+  // Find the slide closest to the viewport center
+  let best = null;
   let bestDist = Infinity;
-  slides.forEach((slide) => {
-    const dist = Math.abs((slide.offsetLeft + slide.offsetWidth / 2) - viewportCenter);
-    if (dist < bestDist) {
-      bestDist = dist;
-      bestSlide = slide;
-    }
+  slides.forEach((s) => {
+    const d = Math.abs(s.offsetLeft + s.offsetWidth / 2 - scrollLeft - cw / 2);
+    if (d < bestDist) { bestDist = d; best = s; }
   });
+  if (!best) return;
 
-  if (!bestSlide) return;
-  const left = Math.max(0, bestSlide.offsetLeft - slidesEl.scrollLeft);
-  const right = Math.max(0, containerWidth - left - bestSlide.offsetWidth);
-  block.style.setProperty('--halo-left', `${left}px`);
-  block.style.setProperty('--halo-right', `${right}px`);
+  const W = best.offsetWidth;
+  const H = best.offsetHeight;
+
+  // Derive the slide's current scale from its cover(inline) animation progress.
+  // Keyframes: 0% translateX(-6%) scale(0.88), 50% none, 100% translateX(+6%) scale(0.88)
+  const coverStart = best.offsetLeft - cw;
+  const coverEnd = best.offsetLeft + W;
+  const p = coverEnd > coverStart
+    ? Math.max(0, Math.min(1, (scrollLeft - coverStart) / (coverEnd - coverStart)))
+    : 0.5;
+  const t = p <= 0.5 ? p * 2 : (1 - p) * 2; // 0→1→0 as p goes 0→0.5→1
+  const scale = 0.88 + 0.12 * t;
+
+  // Visual horizontal bounds (translateX compensation anchors the peek-visible edge)
+  const layoutLeft = best.offsetLeft - scrollLeft;
+  const vLeft = p <= 0.5 ? layoutLeft : layoutLeft + W * (1 - scale);
+  const vRight = p <= 0.5 ? layoutLeft + W * scale : layoutLeft + W;
+
+  // Visual vertical bounds (centered scaling, no translateY)
+  const vShrink = (1 - scale) / 2 * H;
+
+  block.style.setProperty('--halo-left', `${Math.max(0, vLeft)}px`);
+  block.style.setProperty('--halo-right', `${Math.max(0, cw - vRight)}px`);
+  block.style.setProperty('--halo-top', `${Math.max(0, vShrink)}px`);
+  block.style.setProperty('--halo-bottom', `${Math.max(0, vShrink)}px`);
 }
 
 function bindEvents(block) {

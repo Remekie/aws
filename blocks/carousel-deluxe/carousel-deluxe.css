@@ -348,7 +348,7 @@
   }
 
   .carousel-deluxe .carousel-deluxe-slides-container::before {
-    inset: 0 var(--halo-right, 0) 0 var(--halo-left, 0);
+    inset: var(--halo-top, 0) var(--halo-right, 0) var(--halo-bottom, 0) var(--halo-left, 0);
     border-radius: 24px;
   }
 
