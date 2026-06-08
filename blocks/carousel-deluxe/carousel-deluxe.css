@@ -26,7 +26,8 @@
 .carousel-deluxe .carousel-deluxe-slides-container {
   position: relative;
   z-index: 0;
-  overflow: hidden;
+  overflow: clip;
+  overflow-clip-margin: 15px;
 }
 
 /* Gradient halo — sits behind the scroll container so it isn't clipped by overflow: scroll clip */
