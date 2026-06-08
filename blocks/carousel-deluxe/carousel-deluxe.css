@@ -330,8 +330,18 @@
   left: calc(50% - 2px);
 }
 
+/* === Scale animation: peek slides shrink, current slide at 100% === */
+@keyframes carousel-slide-scale {
+  0%, 100% { transform: scale(0.88); }
+  50% { transform: scale(1); }
+}
+
 /* === Desktop styles === */
 @media (width >= 900px) {
+  .carousel-deluxe .carousel-deluxe-slides {
+    gap: 16px;
+  }
+
   .carousel-deluxe .carousel-deluxe-slides-container::before {
     inset: 0 32px;
     border-radius: 24px;
@@ -342,6 +352,10 @@
     flex: 0 0 calc(100vw - 64px);
     width: calc(100vw - 64px);
     padding: 0;
+    animation: carousel-slide-scale linear;
+    animation-timeline: view(inline);
+    animation-range: cover;
+    will-change: transform;
   }
 
   .carousel-deluxe .carousel-deluxe-slide .carousel-deluxe-slide-image {
