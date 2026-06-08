@@ -145,7 +145,7 @@
   --body-line-height: 1.6;
 
   /* nav / layout */
-  --nav-height: 64px;
+  --nav-height: 108px; /* 48px utility bar + 60px primary bar */
   --header-height: var(--nav-height);
 
   /* boilerplate compatibility – map to design tokens */

@@ -1,148 +1,224 @@
 /* stylelint-disable no-descending-specificity */
+
+/* === Fixed wrapper === */
 header .nav-wrapper {
-  background-color: #232f3e;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  height: 64px;
-}
-
-header nav {
-  display: flex;
-  align-items: center;
-  max-width: 1440px;
-  margin: 0 auto;
-  height: 64px;
-  padding: 0 40px;
-  gap: 32px;
-  color: #fff;
   font-family: var(--body-font-family);
-  font-size: 14px;
 }
 
-/* Hide injected meta/script/link elements */
-header nav > meta,
-header nav > script,
-header nav > link {
-  display: none;
+/* Scroll shadow appears once the page scrolls */
+header .nav-wrapper.scrolled .nav-primary-bar {
+  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
 }
 
-/* Each section from the fragment becomes a flex row */
-header nav > .section {
+/* === Dark utility bar (top, ~48px) === */
+header .nav-utility-bar {
+  background-color: #232f3e;
+  height: 48px;
   display: flex;
   align-items: center;
-  padding: 0;
-  margin: 0;
+  justify-content: flex-end;
+  padding: 0 24px;
 }
 
-header nav > .section .default-content-wrapper {
+header .nav-utility-bar .section,
+header .nav-utility-bar .default-content-wrapper {
   display: contents;
 }
 
-/* Section 1: Brand/logo */
-header nav > .section:first-of-type {
-  flex-shrink: 0;
-}
-
-header nav > .section:first-of-type p {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-header nav > .section:first-of-type a:any-link {
-  color: #fff;
-  text-decoration: none;
-}
-
-/* Section 2: Main nav links */
-header nav > .section:nth-of-type(2) {
-  flex: 1;
-}
-
-header nav > .section:nth-of-type(2) ul {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 24px;
-}
-
-header nav > .section:nth-of-type(2) li {
-  margin: 0;
-}
-
-header nav > .section:nth-of-type(2) a:any-link {
-  color: #fff;
-  text-decoration: none;
-  font-weight: 500;
-  white-space: nowrap;
-  transition: color 0.2s;
-}
-
-header nav > .section:nth-of-type(2) a:any-link:hover {
-  color: #0972d3;
-}
-
-/* Section 3: Utility links */
-header nav > .section:nth-of-type(3) ul {
+header .nav-utility-bar ul {
   display: flex;
   list-style: none;
   margin: 0;
   padding: 0;
   gap: 20px;
+  align-items: center;
 }
 
-header nav > .section:nth-of-type(3) li {
+header .nav-utility-bar li {
   margin: 0;
 }
 
-header nav > .section:nth-of-type(3) a:any-link {
-  color: rgb(255 255 255 / 80%);
+header .nav-utility-bar a:any-link {
+  color: rgb(255 255 255 / 85%);
   text-decoration: none;
   font-size: 13px;
+  font-weight: 400;
   white-space: nowrap;
-  transition: color 0.2s;
+  transition: color 0.15s;
 }
 
-header nav > .section:nth-of-type(3) a:any-link:hover {
+header .nav-utility-bar a:any-link:hover {
   color: #fff;
+  text-decoration: underline;
 }
 
-/* Remove EDS button styling in header */
-header nav .button-container {
-  display: inline;
+
+/* === White primary bar (below, ~60px) === */
+header .nav-primary-bar {
+  background-color: #fff;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 32px;
+  border-bottom: 1px solid rgb(0 0 0 / 10%);
+  transition: box-shadow 0.2s;
 }
 
-header nav a.button:any-link {
-  all: unset;
-  color: #fff;
+header .nav-primary-bar .section {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+}
+
+header .nav-primary-bar .default-content-wrapper {
+  display: contents;
+}
+
+/* Brand/logo — left */
+header .nav-primary-bar .section:first-child {
+  flex-shrink: 0;
+}
+
+header .nav-primary-bar .section:first-child p {
+  margin: 0;
+  line-height: 1;
+}
+
+header .nav-primary-bar .section:first-child a:any-link {
+  color: #232f3e;
   text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+/* Logo icon */
+header .nav-primary-bar .icon-logo {
+  display: flex;
+  align-items: center;
+}
+
+header .nav-primary-bar .icon-logo svg,
+header .nav-primary-bar .icon-logo img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+header .nav-primary-bar .icon-logo svg path {
+  fill: #232f3e;
+}
+
+/* Main nav links — fills remaining space */
+header .nav-primary-bar .section:nth-child(2) {
+  flex: 1;
+  overflow: hidden;
+}
+
+header .nav-primary-bar .section:nth-child(2) ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+}
+
+header .nav-primary-bar .section:nth-child(2) li {
+  margin: 0;
+}
+
+header .nav-primary-bar .section:nth-child(2) a:any-link {
+  display: block;
+  color: #232f3e;
+  text-decoration: none;
+  font-size: 14px;
   font-weight: 500;
+  white-space: nowrap;
+  padding: 0 14px;
+  height: 60px;
+  line-height: 60px;
+  border-bottom: 3px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+header .nav-primary-bar .section:nth-child(2) a:any-link:hover {
+  color: #0972d3;
+  border-bottom-color: #0972d3;
+}
+
+/* "Create Account" pill CTA in primary bar — aligned right */
+header .nav-cta {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+header .nav-cta a:any-link {
+  display: inline-block;
+  background-color: #f90;
+  color: #232f3e;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 8px 20px;
+  border-radius: 50px;
+  transition: background-color 0.15s;
+}
+
+header .nav-cta a:any-link:hover {
+  background-color: #e88a00;
+  text-decoration: none;
+}
+
+/* Remove EDS button styling inside nav */
+header .nav-wrapper .button-container {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+header .nav-wrapper a.button:any-link {
+  all: unset;
   cursor: pointer;
 }
 
-/* Space after header for fixed positioning */
+/* === Body offset for fixed two-bar header === */
 body {
-  padding-top: 64px;
+  padding-top: var(--nav-height);
 }
 
+/* === Responsive === */
 @media (width < 900px) {
-  header nav {
+  header .nav-utility-bar {
+    display: none;
+  }
+
+  /* On mobile, only the primary bar (60px) is visible */
+  body {
+    padding-top: 60px;
+  }
+
+  header .nav-primary-bar {
     padding: 0 16px;
     gap: 16px;
-    overflow: hidden;
   }
 
-  header nav > .section:nth-of-type(2) ul {
-    gap: 12px;
+  header .nav-primary-bar .section:nth-child(2) ul {
     overflow-x: auto;
+    scrollbar-width: none;
   }
 
-  header nav > .section:nth-of-type(3) {
+  header .nav-primary-bar .section:nth-child(2) ul::-webkit-scrollbar {
     display: none;
+  }
+
+  header .nav-primary-bar .section:nth-child(2) a:any-link {
+    padding: 0 10px;
   }
 }
