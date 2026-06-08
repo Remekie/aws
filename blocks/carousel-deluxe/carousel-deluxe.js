@@ -18,14 +18,8 @@ function updateActiveSlide(slide) {
     });
   });
 
-  const indicators = block.querySelectorAll('.carousel-deluxe-slide-indicator');
-  indicators.forEach((indicator, idx) => {
-    if (idx !== slideIndex) {
-      indicator.querySelector('button').removeAttribute('disabled');
-    } else {
-      indicator.querySelector('button').setAttribute('disabled', 'true');
-    }
-  });
+  const counter = block.querySelector('.carousel-deluxe-counter-current');
+  if (counter) counter.textContent = slideIndex + 1;
 }
 
 export function showSlide(block, slideIndex = 0, behavior = 'smooth') {
@@ -109,15 +103,7 @@ function handleScrollEnd(block) {
 }
 
 function bindEvents(block) {
-  const slideIndicators = block.querySelector('.carousel-deluxe-slide-indicators');
-  if (!slideIndicators) return;
-
-  slideIndicators.querySelectorAll('button').forEach((button) => {
-    button.addEventListener('click', (e) => {
-      const slideIndicator = e.currentTarget.parentElement;
-      showSlide(block, parseInt(slideIndicator.dataset.targetSlide, 10));
-    });
-  });
+  if (!block.querySelector('.slide-prev')) return;
 
   block.querySelector('.slide-prev').addEventListener('click', () => {
     showSlide(block, parseInt(block.dataset.activeSlide, 10) - 1);
@@ -127,6 +113,20 @@ function bindEvents(block) {
   });
 
   const slidesEl = block.querySelector('.carousel-deluxe-slides');
+
+  // Clicking a peek slide navigates to it; clicks on the active slide pass through normally
+  slidesEl.addEventListener('click', (e) => {
+    const clickedSlide = e.target.closest('.carousel-deluxe-slide');
+    if (!clickedSlide) return;
+    const activeIdx = parseInt(block.dataset.activeSlide, 10);
+    const slideIdx = clickedSlide.dataset.isClone
+      ? parseInt(clickedSlide.dataset.cloneOf, 10)
+      : parseInt(clickedSlide.dataset.slideIndex, 10);
+    if (slideIdx === activeIdx && !clickedSlide.dataset.isClone) return;
+    e.preventDefault();
+    showSlide(block, slideIdx);
+  });
+
   let scrollEndTimer;
   slidesEl.addEventListener('scroll', () => {
     updateHaloPosition(block);
@@ -191,36 +191,24 @@ export default async function decorate(block) {
   slidesWrapper.classList.add('carousel-deluxe-slides');
   block.prepend(slidesWrapper);
 
-  let slideIndicators;
   if (!isSingleSlide) {
-    const slideIndicatorsNav = document.createElement('nav');
-    slideIndicatorsNav.setAttribute('aria-label', placeholders.carouselSlideControls || 'Carousel Slide Controls');
-    slideIndicators = document.createElement('ol');
-    slideIndicators.classList.add('carousel-deluxe-slide-indicators');
-    slideIndicatorsNav.append(slideIndicators);
-    block.append(slideIndicatorsNav);
-
-    const slideNavButtons = document.createElement('div');
-    slideNavButtons.classList.add('carousel-deluxe-navigation-buttons');
-    slideNavButtons.innerHTML = `
-      <button type="button" class= "slide-prev" aria-label="${placeholders.previousSlide || 'Previous Slide'}"></button>
+    const counterEl = document.createElement('div');
+    counterEl.classList.add('carousel-deluxe-counter');
+    counterEl.setAttribute('aria-label', placeholders.carouselSlideControls || 'Carousel Slide Controls');
+    counterEl.innerHTML = `
+      <button type="button" class="slide-prev" aria-label="${placeholders.previousSlide || 'Previous Slide'}"></button>
+      <span class="carousel-deluxe-counter-text" aria-live="polite" aria-atomic="true">
+        <span class="carousel-deluxe-counter-current">1</span>&thinsp;/&thinsp;<span class="carousel-deluxe-counter-total">${rows.length}</span>
+      </span>
       <button type="button" class="slide-next" aria-label="${placeholders.nextSlide || 'Next Slide'}"></button>
     `;
-
-    container.append(slideNavButtons);
+    block.append(counterEl);
   }
 
   rows.forEach((row, idx) => {
     const slide = createSlide(row, idx, carouselId);
     slidesWrapper.append(slide);
 
-    if (slideIndicators) {
-      const indicator = document.createElement('li');
-      indicator.classList.add('carousel-deluxe-slide-indicator');
-      indicator.dataset.targetSlide = idx;
-      indicator.innerHTML = `<button type="button" aria-label="${placeholders.showSlide || 'Show Slide'} ${idx + 1} ${placeholders.of || 'of'} ${rows.length}"></button>`;
-      slideIndicators.append(indicator);
-    }
     row.remove();
   });
 
