@@ -1,5 +1,11 @@
 /** @param {Element} block The hero-gradient block element */
 export default function decorate(block) {
+  const heroImg = block.querySelector('img');
+  if (heroImg) {
+    heroImg.loading = 'eager';
+    heroImg.fetchPriority = 'high';
+  }
+
   const pictures = block.querySelectorAll('picture');
 
   if (pictures.length >= 2) {

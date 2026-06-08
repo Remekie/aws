@@ -18,13 +18,31 @@
 /* === Carousel container === */
 .carousel-deluxe {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   width: 100%;
 }
 
 /* === Slides scroll container === */
 .carousel-deluxe .carousel-deluxe-slides-container {
   position: relative;
+  z-index: 0;
+}
+
+/* Gradient halo — sits behind the scroll container so it isn't clipped by overflow: scroll clip */
+.carousel-deluxe .carousel-deluxe-slides-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  background: linear-gradient(123deg, rgb(0 108 224) 0%, rgb(41 94 255) 50%, rgb(104 66 255) 100%);
+  z-index: -1;
+  filter: none;
+  transition: filter 0.3s ease;
+  pointer-events: none;
+}
+
+.carousel-deluxe .carousel-deluxe-slides-container:hover::before {
+  filter: blur(15px);
 }
 
 .carousel-deluxe .carousel-deluxe-slides,
@@ -47,14 +65,15 @@
 
 /* === Individual slide === */
 .carousel-deluxe .carousel-deluxe-slide {
-  flex: 0 0 100%;
-  scroll-snap-align: start;
+  flex: 0 0 100vw;
+  scroll-snap-align: center;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   position: relative;
-  width: 100%;
+  width: 100vw;
+  box-sizing: border-box;
   height: 400px;
   overflow: hidden;
 }
@@ -76,6 +95,7 @@
   height: 100%;
   width: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
 }
 
 /* Dark gradient overlay for text readability */
@@ -142,6 +162,11 @@
   max-width: 130px;
   height: auto;
   display: block;
+}
+
+/* Image zoom on hover — must come after p:nth-child(2) img to satisfy no-descending-specificity */
+.carousel-deluxe .carousel-deluxe-slide:hover .carousel-deluxe-slide-image picture > img {
+  transform: scale(1.05);
 }
 
 /* === Slide heading (h2) === */
@@ -307,9 +332,16 @@
 
 /* === Desktop styles === */
 @media (width >= 900px) {
+  .carousel-deluxe .carousel-deluxe-slides-container::before {
+    inset: 0 32px;
+    border-radius: 24px;
+  }
+
   .carousel-deluxe .carousel-deluxe-slide {
     height: 640px;
-    padding: 0 16px;
+    flex: 0 0 calc(100vw - 64px);
+    width: calc(100vw - 64px);
+    padding: 0;
   }
 
   .carousel-deluxe .carousel-deluxe-slide .carousel-deluxe-slide-image {

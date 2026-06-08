@@ -31,22 +31,21 @@
   padding: 40px var(--content-padding-inline) 80px;
 }
 
-/* Inner content cell */
+/* Inner content cell — white card over image */
 .hero-gradient > div:last-child > div {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 504px;
-}
-
-/* Ensure the inner cell div fills its absolutely-positioned parent */
-.hero-gradient > div:first-child > div {
-  height: 100%;
+  max-width: 584px;
+  background-color: rgb(255 255 255 / 75%);
+  border-radius: 8px;
+  padding: 24px;
 }
 
 .hero-gradient > div:first-child picture {
   display: block;
-  height: 100%;
+  position: absolute;
+  inset: 0;
 }
 
 .hero-gradient > div:first-child img {
@@ -117,7 +116,11 @@ main .hero-gradient a.button:any-link:focus-visible {
   }
 
   .hero-gradient > div:last-child {
-    padding: 96px max(120px, calc((100% - 1200px) / 2)) 125px;
+    padding: 64px max(120px, calc((100% - 1200px) / 2)) 125px;
+  }
+
+  .hero-gradient > div:last-child > div {
+    padding: 40px;
   }
 
   .hero-gradient h1 {
