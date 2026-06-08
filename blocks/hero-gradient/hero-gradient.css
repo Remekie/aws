@@ -82,7 +82,7 @@
 main .hero-gradient a.button:any-link {
   background-color: var(--color-aws-ink);
   background-image: none;
-  color: var(--color-aws-blue);
+  color: white;
   padding: 10px 26px;
   border-radius: 40px;
   border: 0;

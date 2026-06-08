@@ -115,9 +115,9 @@ header .nav-primary-bar .icon-logo svg path {
   fill: #232f3e;
 }
 
-/* Main nav links — fills remaining space */
+/* Main nav links — sits naturally next to logo; CTA pushes itself right via margin-left: auto */
 header .nav-primary-bar .section:nth-child(2) {
-  flex: 1;
+  flex: none;
   overflow: hidden;
 }
 
@@ -160,8 +160,8 @@ header .nav-cta {
 
 header .nav-cta a:any-link {
   display: inline-block;
-  background-color: #f90;
-  color: #232f3e;
+  background-color: black ;
+  color: white;
   font-size: 13px;
   font-weight: 700;
   text-decoration: none;
