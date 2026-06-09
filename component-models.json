@@ -470,36 +470,23 @@
       {
         "component": "reference",
         "valueType": "string",
-        "name": "imageLightSrc",
-        "label": "Image – Light Mode",
+        "name": "image",
+        "label": "Background Image",
         "multi": false
       },
       {
         "component": "text",
         "valueType": "string",
-        "name": "imageLightAlt",
-        "label": "Image Alt (Light)",
-        "value": ""
-      },
-      {
-        "component": "reference",
-        "valueType": "string",
-        "name": "imageDarkSrc",
-        "label": "Image – Dark Mode",
-        "multi": false
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "imageDarkAlt",
-        "label": "Image Alt (Dark)",
+        "name": "imageAlt",
+        "label": "Image Alt Text",
         "value": ""
       },
       {
         "component": "richtext",
-        "name": "text",
+        "name": "content",
         "label": "Content",
-        "valueType": "string"
+        "valueType": "string",
+        "description": "Add an H1 for the title, paragraphs for description, and a link for the CTA button"
       }
     ]
   },

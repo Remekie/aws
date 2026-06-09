@@ -423,28 +423,20 @@
           "plugins": {
             "da": {
               "name": "hero-gradient",
-              "rows": 3,
+              "rows": 2,
               "columns": 1,
               "fields": [
                 {
-                  "name": "imageLightSrc",
+                  "name": "image",
                   "selector": "div:nth-child(1)>picture>img[src]"
                 },
                 {
-                  "name": "imageLightAlt",
+                  "name": "imageAlt",
                   "selector": "div:nth-child(1)>picture>img[alt]"
                 },
                 {
-                  "name": "imageDarkSrc",
-                  "selector": "div:nth-child(2)>picture>img[src]"
-                },
-                {
-                  "name": "imageDarkAlt",
-                  "selector": "div:nth-child(2)>picture>img[alt]"
-                },
-                {
-                  "name": "text",
-                  "selector": "div:nth-child(3)"
+                  "name": "content",
+                  "selector": "div:nth-child(2)"
                 }
               ]
             }

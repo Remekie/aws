@@ -24,6 +24,19 @@
   z-index: 0;
 }
 
+.hero-gradient > div:first-child picture {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+.hero-gradient > div:first-child img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
 /* Row 2: Text content — overlaid on the image */
 .hero-gradient > div:last-child {
   position: relative;
@@ -40,19 +53,6 @@
   background-color: rgb(255 255 255 / 75%);
   border-radius: 8px;
   padding: 24px;
-}
-
-.hero-gradient > div:first-child picture {
-  display: block;
-  position: absolute;
-  inset: 0;
-}
-
-.hero-gradient > div:first-child img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
 }
 
 /* Heading */
@@ -73,7 +73,7 @@
   margin: 0;
 }
 
-/* Button container spacing */
+/* CTA spacing */
 .hero-gradient p.button-container {
   margin-top: 24px;
 }
