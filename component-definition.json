@@ -428,15 +428,15 @@
               "fields": [
                 {
                   "name": "image",
-                  "selector": "div:nth-child(1)>picture>img[src]"
+                  "selector": "div:nth-child(1)>div>picture>img[src]"
                 },
                 {
                   "name": "imageAlt",
-                  "selector": "div:nth-child(1)>picture>img[alt]"
+                  "selector": "div:nth-child(1)>div>picture>img[alt]"
                 },
                 {
                   "name": "content",
-                  "selector": "div:nth-child(2)"
+                  "selector": "div:nth-child(2)>div"
                 }
               ]
             }
