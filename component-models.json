@@ -678,6 +678,44 @@
     "fields": []
   },
   {
+    "id": "tabs-compass",
+    "fields": [
+      {
+        "component": "select",
+        "name": "classes",
+        "label": "Variant",
+        "options": [
+          {
+            "name": "Default (tab buttons)",
+            "value": ""
+          },
+          {
+            "name": "Customer Stories (dropdown)",
+            "value": "customer-stories"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tabs-compass-tab",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "label",
+        "label": "Tab Label",
+        "required": true
+      },
+      {
+        "component": "richtext",
+        "name": "content",
+        "label": "Tab Content",
+        "valueType": "string"
+      }
+    ]
+  },
+  {
     "id": "tabs",
     "fields": [
       {

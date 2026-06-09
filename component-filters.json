@@ -9,22 +9,13 @@
     "id": "section",
     "components": [
       "cards",
-      "cards-editorial",
-      "cards-industry",
-      "carousel-deluxe",
       "columns",
       "embed",
-      "embed-feedback",
-      "embed-globe",
-      "faq",
       "form",
       "fragment",
       "hero",
-      "hero-gradient",
       "image",
       "journey-map",
-      "product-grid",
-      "quiz",
       "related-articles",
       "search",
       "social-share",
@@ -84,6 +75,12 @@
     "id": "journey-map",
     "components": [
       "journey-map-step"
+    ]
+  },
+  {
+    "id": "tabs-compass",
+    "components": [
+      "tabs-compass-tab"
     ]
   }
 ]

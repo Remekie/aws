@@ -1,0 +1,73 @@
+{
+  "definitions": [
+    {
+      "title": "Tabs Compass",
+      "id": "tabs-compass",
+      "model": "tabs-compass",
+      "filter": "tabs-compass",
+      "plugins": {
+        "da": {
+          "name": "tabs-compass",
+          "rows": 1,
+          "columns": 2
+        }
+      }
+    },
+    {
+      "title": "Tabs Compass Tab",
+      "id": "tabs-compass-tab",
+      "model": "tabs-compass-tab",
+      "plugins": {
+        "da": {
+          "name": "tabs-compass-tab",
+          "rows": 1,
+          "columns": 2,
+          "fields": [
+            { "name": "label", "selector": "div:nth-child(1)" },
+            { "name": "content", "selector": "div:nth-child(2)" }
+          ]
+        }
+      }
+    }
+  ],
+  "models": [
+    {
+      "id": "tabs-compass",
+      "fields": [
+        {
+          "component": "select",
+          "name": "classes",
+          "label": "Variant",
+          "options": [
+            { "name": "Default (tab buttons)", "value": "" },
+            { "name": "Customer Stories (dropdown)", "value": "customer-stories" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tabs-compass-tab",
+      "fields": [
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "label",
+          "label": "Tab Label",
+          "required": true
+        },
+        {
+          "component": "richtext",
+          "name": "content",
+          "label": "Tab Content",
+          "valueType": "string"
+        }
+      ]
+    }
+  ],
+  "filters": [
+    {
+      "id": "tabs-compass",
+      "components": ["tabs-compass-tab"]
+    }
+  ]
+}
