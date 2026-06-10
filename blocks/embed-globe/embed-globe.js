@@ -97,9 +97,12 @@ async function buildGlobe(container, continents, onSelect) {
   const H = container.clientHeight || 480;
   const R = 1.75;
 
+  const DEFAULT_Z = 3.8;
+  const REGION_Z = 2.8;
+
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100);
-  camera.position.z = 5.2;
+  camera.position.z = DEFAULT_Z;
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -222,7 +225,7 @@ async function buildGlobe(container, continents, onSelect) {
   let drag = false;
   let px = 0; let py = 0;
   let rx = 0; let ry = 0;
-  let trx = 0; let try_ = 0;
+  let trx = 0; let try_ = 0; let trz = DEFAULT_Z;
   let autoSpin = true;
   let currentActiveIdx = -1;
 
@@ -260,6 +263,7 @@ async function buildGlobe(container, continents, onSelect) {
 
   function setActiveRegion(regionName) {
     autoSpin = false;
+    trz = REGION_Z;
     currentActiveIdx = allRegions.findIndex((r) => r.name === regionName);
     pinMats.forEach((mat, i) => {
       mat.color.setHex(i === currentActiveIdx ? COLOR_ACTIVE : COLOR_HEAD);
@@ -270,18 +274,19 @@ async function buildGlobe(container, continents, onSelect) {
     if (currentActiveIdx >= 0) {
       const reg = allRegions[currentActiveIdx];
       try_ = -(Math.PI / 2 + reg.lng * (Math.PI / 180));
-      trx = reg.lat * (Math.PI / 180) * 0.45;
+      trx = reg.lat * (Math.PI / 180);
     }
   }
 
   function setActiveContinent(ci) {
     autoSpin = false;
+    trz = DEFAULT_Z;
     currentActiveIdx = -1;
     pinMats.forEach((mat) => { mat.color.setHex(COLOR_HEAD); });
     pinGroups.forEach((pg) => { pg.scale.setScalar(1); });
     const co = CONTINENT_COORDS[continents[ci].name] || fallbackCoords(ci, continents.length);
     try_ = -(Math.PI / 2 + co.lng * (Math.PI / 180));
-    trx = co.lat * (Math.PI / 180) * 0.45;
+    trx = co.lat * (Math.PI / 180);
   }
 
   (function animate() {
@@ -290,6 +295,7 @@ async function buildGlobe(container, continents, onSelect) {
     if (autoSpin) try_ += 0.0018;
     rx += (trx - rx) * 0.06;
     ry += (try_ - ry) * 0.06;
+    camera.position.z += (trz - camera.position.z) * 0.06;
     globe.rotation.x = rx; globe.rotation.y = ry;
     markerGroup.rotation.x = rx; markerGroup.rotation.y = ry;
 
@@ -306,7 +312,14 @@ async function buildGlobe(container, continents, onSelect) {
     renderer.render(scene, camera);
   }());
 
-  return { setActiveRegion, setActiveContinent };
+  const MIN_ZOOM_Z = 2.5;
+  const MAX_ZOOM_Z = 6.5;
+  const ZOOM_STEP = 0.4;
+  function zoom(dir) {
+    trz = Math.max(MIN_ZOOM_Z, Math.min(MAX_ZOOM_Z, trz + dir * ZOOM_STEP));
+  }
+
+  return { setActiveRegion, setActiveContinent, zoom };
 }
 
 // ---------------------------------------------------------------------------
@@ -432,10 +445,28 @@ export default async function decorate(block) {
   globeCol.className = 'eg-globe-col';
   const globeContainer = document.createElement('div');
   globeContainer.className = 'eg-globe-container';
-  const hint = document.createElement('p');
-  hint.className = 'eg-hint';
-  hint.textContent = 'Drag to rotate · Click region to explore';
-  globeCol.append(globeContainer, hint);
+
+  const hintBar = document.createElement('div');
+  hintBar.className = 'eg-hint-bar';
+
+  const zoomIn = document.createElement('button');
+  zoomIn.className = 'eg-zoom-btn';
+  zoomIn.setAttribute('aria-label', 'Zoom in');
+  zoomIn.textContent = '+';
+  zoomIn.addEventListener('click', () => globeCtrl?.zoom(-1));
+
+  const hintText = document.createElement('span');
+  hintText.className = 'eg-hint-text';
+  hintText.textContent = 'Drag to rotate · Click region to explore';
+
+  const zoomOut = document.createElement('button');
+  zoomOut.className = 'eg-zoom-btn';
+  zoomOut.setAttribute('aria-label', 'Zoom out');
+  zoomOut.textContent = '−';
+  zoomOut.addEventListener('click', () => globeCtrl?.zoom(1));
+
+  hintBar.append(zoomIn, hintText, zoomOut);
+  globeCol.append(globeContainer, hintBar);
 
   bodyRow.append(panelCol, globeCol);
   wrapper.append(tabBar, bodyRow);
