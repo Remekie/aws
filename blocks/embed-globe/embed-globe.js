@@ -142,33 +142,65 @@ async function buildGlobe(container, continents, onSelect) {
     });
   });
 
-  // Individual region markers
+  // Pin markers — sphere head + tapered cone tail, oriented radially
+  const PIN_HEAD_R = 0.028;
+  const PIN_TAIL_H = 0.10;
+  const PIN_TAIL_R = 0.010;
+  const PIN_HEAD_Y = PIN_TAIL_H;
+  const COLOR_HEAD = 0x22c55e;   // green
+  const COLOR_TAIL = 0x111111;   // black
+  const COLOR_ACTIVE = 0xa000b8; // purple (selected head)
+
   const markerGroup = new THREE.Group();
   scene.add(markerGroup);
-  const mGeo = new THREE.SphereGeometry(0.038, 10, 10);
-  const rGeo = new THREE.RingGeometry(0.05, 0.075, 32);
-  const markers = [];
+
+  const headGeo = new THREE.SphereGeometry(PIN_HEAD_R, 12, 12);
+  const tailGeo = new THREE.ConeGeometry(PIN_TAIL_R, PIN_TAIL_H, 8);
+  const ringGeo = new THREE.RingGeometry(PIN_HEAD_R + 0.014, PIN_HEAD_R + 0.038, 32);
+
+  const pinGroups = [];
+  const pinHeads = []; // raycasting targets
+  const pinMats = [];  // one material per pin for colour updates
   const rings = [];
 
   allRegions.forEach((reg, ri) => {
-    const pos = latLngToVec3(reg.lat, reg.lng, R + 0.035);
+    const pos = latLngToVec3(reg.lat, reg.lng, R + 0.005);
     const v = new THREE.Vector3(pos.x, pos.y, pos.z);
 
-    const mMat = new THREE.MeshPhongMaterial({ color: 0x16191f });
-    const m = new THREE.Mesh(mGeo, mMat);
-    m.position.copy(v);
-    m.userData.regionIdx = ri;
-    markerGroup.add(m);
-    markers.push(m);
+    const pin = new THREE.Group();
+    pin.position.copy(v);
+    // Orient pin so local Y+ points radially outward from globe centre
+    pin.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), v.clone().normalize());
 
+    const headMat = new THREE.MeshPhongMaterial({ color: COLOR_HEAD, shininess: 60 });
+    const tailMat = new THREE.MeshPhongMaterial({ color: COLOR_TAIL, shininess: 10 });
+    pinMats.push(headMat);
+
+    // Sphere head at top of pin
+    const head = new THREE.Mesh(headGeo, headMat);
+    head.position.y = PIN_HEAD_Y;
+    head.userData.regionIdx = ri;
+    pin.add(head);
+    pinHeads.push(head);
+
+    // Cone tail — flip so tip points down (toward globe surface at y=0)
+    const tail = new THREE.Mesh(tailGeo, tailMat);
+    tail.rotation.z = Math.PI;
+    tail.position.y = PIN_TAIL_H / 2;
+    pin.add(tail);
+
+    // Pulse ring around head (hidden until active)
     const rMat = new THREE.MeshBasicMaterial({
-      color: 0xa000b8, transparent: true, opacity: 0, side: THREE.DoubleSide,
+      color: COLOR_ACTIVE, transparent: true, opacity: 0, side: THREE.DoubleSide,
     });
-    const ring = new THREE.Mesh(rGeo, rMat);
-    ring.position.copy(v);
-    ring.lookAt(new THREE.Vector3(0, 0, 0));
-    markerGroup.add(ring);
+    const ring = new THREE.Mesh(ringGeo, rMat);
+    ring.position.y = PIN_HEAD_Y;
+    ring.rotation.x = Math.PI / 2;
+    pin.add(ring);
     rings.push(ring);
+
+    markerGroup.add(pin);
+    pinGroups.push(pin);
   });
 
   // Raycaster
@@ -179,7 +211,7 @@ async function buildGlobe(container, continents, onSelect) {
     mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
     ray.setFromCamera(mouse, camera);
-    const hits = ray.intersectObjects(markers);
+    const hits = ray.intersectObjects(pinHeads);
     if (hits.length) {
       const reg = allRegions[hits[0].object.userData.regionIdx];
       onSelect({ regionName: reg.name, continentIdx: reg.continentIdx });
@@ -229,9 +261,11 @@ async function buildGlobe(container, continents, onSelect) {
   function setActiveRegion(regionName) {
     autoSpin = false;
     currentActiveIdx = allRegions.findIndex((r) => r.name === regionName);
-    markers.forEach((m, i) => {
-      m.material.color.setHex(i === currentActiveIdx ? 0xa000b8 : 0x16191f);
-      m.scale.setScalar(i === currentActiveIdx ? 1.8 : 1);
+    pinMats.forEach((mat, i) => {
+      mat.color.setHex(i === currentActiveIdx ? COLOR_ACTIVE : COLOR_HEAD);
+    });
+    pinGroups.forEach((pg, i) => {
+      pg.scale.setScalar(i === currentActiveIdx ? 1.35 : 1);
     });
     if (currentActiveIdx >= 0) {
       const reg = allRegions[currentActiveIdx];
@@ -243,10 +277,8 @@ async function buildGlobe(container, continents, onSelect) {
   function setActiveContinent(ci) {
     autoSpin = false;
     currentActiveIdx = -1;
-    markers.forEach((m) => {
-      m.material.color.setHex(0x16191f);
-      m.scale.setScalar(1);
-    });
+    pinMats.forEach((mat) => { mat.color.setHex(COLOR_HEAD); });
+    pinGroups.forEach((pg) => { pg.scale.setScalar(1); });
     const co = CONTINENT_COORDS[continents[ci].name] || fallbackCoords(ci, continents.length);
     try_ = -(Math.PI / 2 + co.lng * (Math.PI / 180));
     trx = co.lat * (Math.PI / 180) * 0.45;
@@ -264,8 +296,8 @@ async function buildGlobe(container, continents, onSelect) {
     rings.forEach((ring, i) => {
       if (i === currentActiveIdx) {
         const pulse = (Math.sin(t * 2.2) + 1) / 2;
-        ring.scale.setScalar(1 + pulse * 0.4);
-        ring.material.opacity = 0.5 - pulse * 0.4;
+        ring.scale.setScalar(1 + pulse * 0.5);
+        ring.material.opacity = 0.6 - pulse * 0.5;
       } else {
         ring.scale.setScalar(1);
         ring.material.opacity = 0;
