@@ -806,3 +806,22 @@ main > .section.carousel-deluxe-container .default-content-wrapper p {
   color: rgb(35 43 55);
   margin: 0;
 }
+
+/* Columns section heading */
+main > .section.columns-container .default-content-wrapper {
+  margin-bottom: 24px;
+}
+
+main > .section.columns-container .default-content-wrapper h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: rgb(22 29 38);
+  margin: 0 0 8px;
+}
+
+main > .section.columns-container .default-content-wrapper p {
+  font-size: 16px;
+  color: rgb(35 43 55);
+  margin: 0;
+}
+
