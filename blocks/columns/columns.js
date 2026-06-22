@@ -1,46 +1,86 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
 export default function decorate(block) {
-  const cols = [...block.firstElementChild.children];
-  block.classList.add(`columns-${cols.length}-cols`);
+  const rows = [...block.children];
+  const cards = [];
 
-  // setup image columns and card structure
-  [...block.children].forEach((row) => {
+  if (rows.length > 1) {
+    // Case 1: Multi-row table where cells are aligned vertically to form cards
+    const numCols = rows[0].children.length;
+    for (let j = 0; j < numCols; j++) {
+      const card = document.createElement('div');
+      card.classList.add('columns-card');
+
+      const imgCol = document.createElement('div');
+      imgCol.classList.add('columns-img-col');
+
+      const bodyCol = document.createElement('div');
+      bodyCol.classList.add('columns-card-body');
+
+      rows.forEach((row) => {
+        const cell = row.children[j];
+        if (cell) {
+          const pic = cell.querySelector('picture');
+          if (pic) {
+            imgCol.appendChild(pic);
+          } else {
+            // Append all children of the cell to the bodyCol
+            while (cell.firstChild) {
+              bodyCol.appendChild(cell.firstChild);
+            }
+          }
+        }
+      });
+
+      // Only append imgCol if it has children (i.e. contains a picture)
+      if (imgCol.children.length > 0) {
+        card.appendChild(imgCol);
+      } else {
+        bodyCol.style.borderRadius = '16px';
+      }
+      card.appendChild(bodyCol);
+      cards.push(card);
+    }
+  } else if (rows.length === 1) {
+    // Case 2: Single-row table where each column/cell is already a self-contained card
+    const row = rows[0];
     [...row.children].forEach((col) => {
+      const card = document.createElement('div');
+      card.classList.add('columns-card');
+
+      const imgCol = document.createElement('div');
+      imgCol.classList.add('columns-img-col');
+
+      const bodyCol = document.createElement('div');
+      bodyCol.classList.add('columns-card-body');
+
       const pic = col.querySelector('picture');
       if (pic) {
-        const picWrapper = pic.closest('div');
-        if (picWrapper && picWrapper.children.length === 1) {
-          // picture is only content in column — pure image col
-          picWrapper.classList.add('columns-img-col');
-        } else {
-          // mixed column with image + text — split into card image / card body
-          picWrapper.classList.add('columns-card-image');
-          [...picWrapper.children].forEach((child) => {
-            if (!child.querySelector('picture') && child !== pic) {
-              child.classList.add('columns-card-body');
-            }
-          });
-        }
+        imgCol.appendChild(pic);
+        card.appendChild(imgCol);
+      } else {
+        bodyCol.style.borderRadius = '16px';
       }
 
-      // Wrap remaining non-image divs as card body when there is an image sibling
-      const hasImageCol = [...row.children].some((c) => c.classList.contains('columns-img-col') || c.classList.contains('columns-card-image'));
-      if (hasImageCol && !col.classList.contains('columns-img-col') && !col.classList.contains('columns-card-image')) {
-        col.classList.add('columns-card-body');
+      // Move everything else in the column cell to the bodyCol
+      while (col.firstChild) {
+        bodyCol.appendChild(col.firstChild);
       }
+
+      card.appendChild(bodyCol);
+      cards.push(card);
     });
-  });
+  }
 
-  // When each row is a card (image col + body col) — convert row to a card wrapper
-  [...block.children].forEach((row) => {
-    const imgCol = row.querySelector('.columns-img-col');
-    const bodyCol = row.querySelector('.columns-card-body');
-    if (imgCol && bodyCol) {
-      row.classList.add('columns-card');
-    }
-  });
+  // If we created cards, clear block and append them directly to block
+  if (cards.length > 0) {
+    block.innerHTML = '';
+    cards.forEach((card) => block.appendChild(card));
+    // Set a class indicating the number of columns
+    block.classList.add(`columns-${cards.length}-cols`);
+  }
 
+  // Optimize images
   block.querySelectorAll('picture > img').forEach((img) => {
     const optimizedPic = createOptimizedPicture(img.src, img.alt, false, [{ width: '750' }]);
     img.closest('picture').replaceWith(optimizedPic);
