@@ -1,42 +1,268 @@
-.columns > div {
+/*
+ * Block: columns
+ * Default: side-by-side layout (image left, text right or pure multi-col)
+ * Card variant: 3-up cards matching cards-editorial styling
+ *   triggered when each row has .columns-img-col + .columns-card-body
+ */
+
+/* ============================================================
+   Container / section padding — mirrors cards-editorial
+   ============================================================ */
+.columns-container {
+  padding-block: 40px;
+  padding-inline: var(--content-padding-inline);
+  box-sizing: border-box;
+}
+
+@media (width >= 900px) {
+  .columns-container {
+    padding-block: 60px;
+    padding-inline: max(120px, calc((100% - 1200px) / 2));
+  }
+}
+
+/* ============================================================
+   Card grid layout (3-up, same as cards-editorial)
+   Only applies when rows have .columns-card class (image + body cols)
+   ============================================================ */
+.columns:has(.columns-card) {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (width >= 600px) {
+  .columns:has(.columns-card) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (width >= 1200px) {
+  .columns:has(.columns-card) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Card shell — matches cards-editorial li */
+.columns .columns-card {
+  background-color: rgb(243 243 247);
+  border-radius: 16px;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 0;
+}
+
+/* Glow border pseudo-element — same gradient as cards-editorial */
+.columns .columns-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(123deg, rgb(0 108 224) 0%, rgb(41 94 255) 50%, rgb(104 66 255) 100%);
+  z-index: -1;
+  filter: none;
+  transition: filter 0.3s ease;
+}
+
+.columns .columns-card:hover::before {
+  filter: blur(15px);
+}
+
+/* ============================================================
+   Image area
+   ============================================================ */
+.columns .columns-img-col {
+  position: relative;
+  overflow: hidden;
+  line-height: 0;
+  border-radius: 16px 16px 0 0;
+  order: 0;
+}
+
+.columns .columns-img-col picture {
+  display: block;
+}
+
+.columns .columns-img-col img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.columns .columns-card:hover .columns-img-col img {
+  transform: scale(1.1);
+}
+
+/* ============================================================
+   Card body
+   ============================================================ */
+.columns .columns-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  padding: 24px;
+  gap: 16px;
+  background-color: rgb(243 243 247);
+  border-radius: 0 0 16px 16px;
+  order: 1;
+}
+
+.columns .columns-card-body :is(h2, h3) {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgb(22 29 38);
+  line-height: 1.333;
+  margin: 0;
+  font-family: var(--body-font-family);
+  letter-spacing: -0.01em;
+}
+
+.columns .columns-card-body p {
+  font-size: 14px;
+  color: rgb(35 43 55);
+  line-height: 1.65;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* CTA link — last p in body */
+.columns .columns-card-body p.button-container {
+  margin: 0;
+  padding-top: 8px;
+  margin-top: auto;
+}
+
+main .columns .columns-card-body a.button:any-link,
+.columns .columns-card-body a:any-link {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgb(22 29 38);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.4;
+  max-width: none;
+  white-space: normal;
+}
+
+main .columns .columns-card-body a.button:any-link:hover,
+.columns .columns-card-body a:any-link:hover {
+  color: var(--color-link);
+  text-decoration: none;
+  background: none;
+  border: none;
+  box-shadow: none;
+  transform: none;
+}
+
+main .columns .columns-card-body a.button:any-link::after,
+.columns .columns-card-body a:any-link::after {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='rgb(22,29,38)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8h10M9 4l4 4-4 4'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: static;
+  transform: none;
+  transition: transform 0.2s ease;
+}
+
+main .columns .columns-card-body a.button:any-link:hover::after,
+.columns .columns-card-body a:any-link:hover::after {
+  transform: translateX(4px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='rgb(9,114,211)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8h10M9 4l4 4-4 4'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
+   CTA button row (orange pill button — e.g. "CREATE FREE ACCOUNT")
+   EDS wraps these as <p><a class="button">…</a></p>
+   ============================================================ */
+.columns .columns-card-body p.button-container a.button:any-link:not(.secondary):not(.outline) {
+  background-color: var(--color-aws-orange, #f90);
+  color: #000;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
+}
+
+.columns .columns-card-body p.button-container a.button:any-link:not(.secondary):not(.outline)::after {
+  display: none;
+}
+
+.columns .columns-card-body p.button-container a.button:any-link:not(.secondary):not(.outline):hover {
+  background-color: var(--color-aws-smile, #ec7211);
+  color: #000;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ============================================================
+   Non-card: default side-by-side layout (unchanged behaviour)
+   ============================================================ */
+.columns:not(:has(.columns-card)) > div {
   display: flex;
   flex-direction: column;
   gap: var(--space-l);
 }
 
-.columns img {
+.columns:not(:has(.columns-card)) img {
   width: 100%;
   border-radius: 12px;
 }
 
-.columns > div > div {
+.columns:not(:has(.columns-card)) > div > div {
   order: 1;
 }
 
-.columns > div > .columns-img-col {
+.columns:not(:has(.columns-card)) > div > .columns-img-col {
   order: 0;
 }
 
-.columns > div > .columns-img-col img {
+.columns:not(:has(.columns-card)) > div > .columns-img-col img {
   display: block;
 }
 
-.columns > div > div :is(h2, h3) {
+.columns:not(:has(.columns-card)) > div > div :is(h2, h3) {
   letter-spacing: -0.01em;
 }
 
-.columns > div > div p {
+.columns:not(:has(.columns-card)) > div > div p {
   line-height: 1.65;
 }
 
 @media (width >= 900px) {
-  .columns > div {
+  .columns:not(:has(.columns-card)) > div {
     align-items: center;
     flex-direction: unset;
     gap: var(--space-2xl, 48px);
   }
 
-  .columns > div > div {
+  .columns:not(:has(.columns-card)) > div > div {
     flex: 1;
     order: unset;
   }
