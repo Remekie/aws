@@ -11,7 +11,7 @@ module.exports = [
       globals: globals.browser,
     },
     rules: {
-      'linebreak-style': ['error', 'unix'],
+      'linebreak-style': 'off',
       'no-param-reassign': [2, { props: false }],
       'no-unused-vars': ['error', { caughtErrors: 'none' }],
     },

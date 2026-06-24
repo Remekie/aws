@@ -96,10 +96,6 @@
   transition: transform 0.3s ease;
 }
 
-.columns .columns-card:hover .columns-img-col img {
-  transform: scale(1.1);
-}
-
 /* ============================================================
    Card body
    ============================================================ */
@@ -194,7 +190,7 @@ main .columns .columns-card-body a.button:any-link:hover::after,
    CTA button row (orange pill button — e.g. "CREATE FREE ACCOUNT")
    EDS wraps these as <p><a class="button">…</a></p>
    ============================================================ */
-.columns .columns-card-body p.button-container a.button:any-link:not(.secondary):not(.outline) {
+.columns .columns-card-body p.button-container a.button:any-link:not(.secondary, .outline) {
   background-color: var(--color-aws-orange, #f90);
   color: #000;
   font-weight: 700;
@@ -210,11 +206,11 @@ main .columns .columns-card-body a.button:any-link:hover::after,
   transition: background-color 0.2s ease;
 }
 
-.columns .columns-card-body p.button-container a.button:any-link:not(.secondary):not(.outline)::after {
+.columns .columns-card-body p.button-container a.button:any-link:not(.secondary, .outline)::after {
   display: none;
 }
 
-.columns .columns-card-body p.button-container a.button:any-link:not(.secondary):not(.outline):hover {
+.columns .columns-card-body p.button-container a.button:any-link:not(.secondary, .outline):hover {
   background-color: var(--color-aws-smile, #ec7211);
   color: #000;
   transform: none;
@@ -239,11 +235,11 @@ main .columns .columns-card-body a.button:any-link:hover::after,
   order: 1;
 }
 
-.columns:not(:has(.columns-card)) > div > .columns-img-col {
+.columns:not(:has(.columns-card)) .columns-img-col {
   order: 0;
 }
 
-.columns:not(:has(.columns-card)) > div > .columns-img-col img {
+.columns:not(:has(.columns-card)) .columns-img-col img {
   display: block;
 }
 
@@ -267,3 +263,8 @@ main .columns .columns-card-body a.button:any-link:hover::after,
     order: unset;
   }
 }
+
+.columns .columns-card:hover .columns-img-col img {
+  transform: scale(1.1);
+}
+
